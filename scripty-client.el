@@ -1,6 +1,4 @@
-;;; scripty-client  -*- lexical-binding: t -*-
-
-;; Run scripty from emacs
+;;; scripty-client.el --- Run scripty from emacs
 
 (require 'dash)
 (require 's)

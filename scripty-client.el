@@ -21,3 +21,5 @@
     (let ((additional-args (read-string "args: ")))
       (async-shell-command (concat scripty-executable " " arg " " additional-args)
                            (concat "*scripty-" arg "*")))))
+
+(provide 'scripty-client)

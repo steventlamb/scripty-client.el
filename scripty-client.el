@@ -5,6 +5,12 @@
 
 (defvar scripty-executable "scripty")
 
+(defvar scripty-last-script nil "do not hand-edit")
+(put 'scripty-last-script 'risky-local-variable t)
+
+(defvar scripty-last-args nil "do not hand-edit")
+(put 'scripty-last-args 'risky-local-variable t)
+
 (defun scripty-get-choices ()
   (interactive)
   (let* ((list-command (concat scripty-executable " -l"))
@@ -17,10 +23,12 @@
    (let ((choices (scripty-get-choices)))
      (if (null choices)
          '("")
-       (list (ido-completing-read "command: " (scripty-get-choices))))))
+       (list (ido-completing-read "command: " (scripty-get-choices) nil t scripty-last-script)))))
   (if (equal arg "")
       (message "No scripty dir found")
-    (let ((additional-args (read-string "args: ")))
+    (let ((additional-args (read-string "args: " scripty-last-args)))
+      (setq scripty-last-script arg)
+      (setq scripty-last-args additional-args)
       (async-shell-command (concat scripty-executable " " arg " " additional-args)
                            (concat "*scripty-" arg "*")))))
 

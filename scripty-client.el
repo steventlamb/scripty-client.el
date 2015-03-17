@@ -18,18 +18,24 @@
          (lines (if (equal "" cmd-results) '() (s-split "\n" cmd-results))))
     (-map 's-trim lines)))
 
-(defun scripty (arg)
+(defun scripty (command)
+  ;; populate command
   (interactive 
    (let ((choices (scripty-get-choices)))
      (if (null choices)
          '("")
-       (list (ido-completing-read "command: " (scripty-get-choices) nil t scripty-last-script)))))
-  (if (equal arg "")
+       (let ((completion
+              (ido-completing-read
+               (concat "command (default: \"" scripty-last-script "\"): ") choices nil t)))
+         (list (if (s-blank? completion) scripty-last-script completion))))))
+
+  ;; process command, prompt for arg, execute, save last values
+  (if (equal command "")
       (message "No scripty dir found")
-    (let ((additional-args (read-string "args: " scripty-last-args)))
-      (setq scripty-last-script arg)
-      (setq scripty-last-args additional-args)
-      (async-shell-command (concat scripty-executable " " arg " " additional-args)
-                           (concat "*scripty-" arg "*")))))
+    (let ((args (read-string "args: " scripty-last-args)))
+      (setq scripty-last-script command)
+      (setq scripty-last-args args)
+      (async-shell-command (concat scripty-executable " " command " " args)
+                           (concat "*scripty-" command "*")))))
 
 (provide 'scripty-client)

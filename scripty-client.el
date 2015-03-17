@@ -5,10 +5,10 @@
 
 (defvar scripty-executable "scripty")
 
-(defvar scripty-last-script nil "do not hand-edit")
+(defvar scripty-last-script "" "do not hand-edit")
 (put 'scripty-last-script 'risky-local-variable t)
 
-(defvar scripty-last-args nil "do not hand-edit")
+(defvar scripty-last-args "" "do not hand-edit")
 (put 'scripty-last-args 'risky-local-variable t)
 
 (defun scripty-get-choices ()

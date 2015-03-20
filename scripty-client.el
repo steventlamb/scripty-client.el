@@ -8,7 +8,7 @@
 (defvar scripty-last-script "" "do not hand-edit")
 (put 'scripty-last-script 'risky-local-variable t)
 
-(defvar scripty-last-args "" "do not hand-edit")
+(defvar scripty-last-args nil "do not hand-edit")
 (put 'scripty-last-args 'risky-local-variable t)
 
 (defun scripty-get-choices ()
@@ -32,9 +32,9 @@
   ;; process command, prompt for arg, execute, save last values
   (if (equal command "")
       (message "No scripty dir found")
-    (let ((args (read-string "args: " scripty-last-args)))
+    (let ((args (read-string "args: " (lax-plist-get scripty-last-args command))))
       (setq scripty-last-script command)
-      (setq scripty-last-args args)
+      (setq scripty-last-args (lax-plist-put scripty-last-args command args))
       (async-shell-command (concat scripty-executable " " command " " args)
                            (concat "*scripty-" command "*")))))
 

@@ -18,24 +18,27 @@
          (lines (if (equal "" cmd-results) '() (s-split "\n" cmd-results))))
     (-map 's-trim lines)))
 
-(defun scripty (command)
-  ;; populate command
-  (interactive 
-   (let ((choices (scripty-get-choices)))
-     (if (null choices)
-         '("")
-       (let ((completion
-              (ido-completing-read
-               (concat "command (default: \"" scripty-last-script "\"): ") choices nil t)))
-         (list (if (s-blank? completion) scripty-last-script completion))))))
+(defun scripty-prompt-for-command ()
+  (let ((choices (scripty-get-choices)))
+    (unless (null choices)
+      (let ((completion
+             (ido-completing-read
+              (concat "command (default: \"" scripty-last-script "\"): ") choices nil t)))
+        (if (s-blank? completion) scripty-last-script completion)))))
 
-  ;; process command, prompt for arg, execute, save last values
-  (if (equal command "")
-      (message "No scripty dir found")
-    (let ((args (read-string "args: " (lax-plist-get scripty-last-args command))))
-      (setq scripty-last-script command)
-      (setq scripty-last-args (lax-plist-put scripty-last-args command args))
-      (async-shell-command (concat scripty-executable " " command " " args)
-                           (concat "*scripty-" command "*")))))
+(defun scripty ()
+  ;; populate command
+  (interactive)
+
+  (let ((command (scripty-prompt-for-command)))
+
+    ;; process command, prompt for arg, execute, save last values
+    (if (null command)
+        (message "No scripty dir found")
+      (let ((args (read-string "args: " (lax-plist-get scripty-last-args command))))
+        (setq scripty-last-script command)
+        (setq scripty-last-args (lax-plist-put scripty-last-args command args))
+        (async-shell-command (concat scripty-executable " " command " " args)
+                             (concat "*scripty-" command "*"))))))
 
 (provide 'scripty-client)

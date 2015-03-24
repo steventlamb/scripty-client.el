@@ -3,16 +3,28 @@
 (require 'dash)
 (require 's)
 
-(defvar scripty-executable "scripty")
+;;;;;;;;;;;;;;;;;;;
+;;; PUBLIC VARS ;;;
+;;;;;;;;;;;;;;;;;;;
+
+(defvar scripty-executable "scripty"
+  "The executable used to run scripty.
+
+You can customize this var if you don't have`scripty`
+available on your path")
+
+(defcustom scripty-confirm-buffer-name nil
+  "Prompt the user to edit buffer names when set to `t`")
+
+;;;;;;;;;;;;;;;;;;;;
+;;; INTERNAL API ;;;
+;;;;;;;;;;;;;;;;;;;;
 
 (defvar scripty-last-script "" "do not hand-edit")
 (put 'scripty-last-script 'risky-local-variable t)
 
 (defvar scripty-last-args nil "do not hand-edit")
 (put 'scripty-last-args 'risky-local-variable t)
-
-(defcustom scripty-confirm-buffer-name nil
-  "Prompt the user to edit buffer names when set to `t`")
 
 (defun scripty-get-choices ()
   (interactive)
@@ -58,6 +70,10 @@ Finally, prompt to confirm the choice of name if
 
 (defun scripty-run (command args buffer-name)
   (async-shell-command (concat scripty-executable " " command " " args) buffer-name))
+
+;;;;;;;;;;;;;;;;;;
+;;; PUBLIC API ;;;
+;;;;;;;;;;;;;;;;;;
 
 (defun scripty-rerun ()
   (interactive)

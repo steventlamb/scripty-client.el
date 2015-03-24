@@ -36,20 +36,25 @@ The default syntax is '*scripty-<command>*', but we must first look
 for existing buffers with that name and add an increasing unique id,
 for example, '*scripty-<command>*<1>'
 
+If the current buffer is a scripty buffer, try hard to reuse that one.
+
 Finally, prompt to confirm the choice of name if
 `scripty-confirm-buffer-name` is `t`.
 "
-  (let* ((base-name (concat "*scripty-" command "*"))
-         (suffix "")
-         (id 1)
-         (name base-name))
-    (while (get-buffer name)
-      (setq id (+ 1 id))
-      (setq suffix (concat "<" (number-to-string id) ">"))
-      (setq name (concat base-name suffix)))
-    (if scripty-confirm-buffer-name
-        (setq name (read-string "buffer name: " name)))
-    name))
+  (let*
+      ((base-buffer-name (concat "*scripty-" command "*"))
+       (candidate (if (equal (buffer-name (current-buffer)) base-buffer-name)
+                      base-buffer-name
+                    (let ((suffix "")
+                          (id 1)
+                          (name base-buffer-name))
+                      (while (get-buffer name)
+                        (setq id (+ 1 id))
+                        (setq suffix (concat "<" (number-to-string id) ">"))
+                        (setq name (concat base-buffer-name suffix)))
+                      name))))
+    ;; always prompt if the var is set, even if we're sure we want to reuse
+    (if scripty-confirm-buffer-name (read-string "buffer name: " candidate) candidate)))
 
 (defun scripty ()
   ;; populate command

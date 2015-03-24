@@ -56,6 +56,14 @@ Finally, prompt to confirm the choice of name if
     ;; always prompt if the var is set, even if we're sure we want to reuse
     (if scripty-confirm-buffer-name (read-string "buffer name: " candidate) candidate)))
 
+(defun scripty-run (command args buffer-name)
+  (async-shell-command (concat scripty-executable " " command " " args) buffer-name))
+
+(defun scripty-rerun ()
+  (interactive)
+  (let ((c scripty-last-script))
+    (scripty-run c (lax-plist-get scripty-last-args c) (scripty-get-buffer-name c))))
+
 (defun scripty ()
   ;; populate command
   (interactive)
@@ -69,6 +77,6 @@ Finally, prompt to confirm the choice of name if
             (buffer-name (scripty-get-buffer-name command)))
         (setq scripty-last-script command)
         (setq scripty-last-args (lax-plist-put scripty-last-args command args))
-        (async-shell-command (concat scripty-executable " " command " " args) buffer-name)))))
+        (scripty-run command args buffer-name)))))
 
 (provide 'scripty-client)

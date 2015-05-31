@@ -36,10 +36,12 @@ available on your path")
 (defun scripty/prompt-for-command! ()
   (let ((choices (scripty/get-choices!)))
     (unless (null choices)
+      (if (-contains? choices scripty/last-script)
+          (setq choices (-uniq (cons scripty/last-script choices))))
       (let ((completion
              (ido-completing-read
-              (concat "command (default: \"" scripty/last-script "\"): ") choices nil t)))
-        (if (s-blank? completion) scripty/last-script completion)))))
+              (concat "command: ") choices nil t)))
+        completion))))
 
 (defun scripty/get-buffer-name! (command)
   "given the name of a command, build a suggested buffer name.

@@ -44,31 +44,7 @@ available on your path")
         completion))))
 
 (defun scripty/get-buffer-name! (command)
-  "given the name of a command, build a suggested buffer name.
-
-The default syntax is '*scripty-<command>*', but we must first look
-for existing buffers with that name and add an increasing unique id,
-for example, '*scripty-<command>*<1>'
-
-If the current buffer is a scripty buffer, try hard to reuse that one.
-
-Finally, prompt to confirm the choice of name if
-`scripty/confirm-buffer-name` is `t`.
-"
-  (let*
-      ((base-buffer-name (concat "*scripty-" command "*"))
-       (candidate (if (equal (buffer-name (current-buffer)) base-buffer-name)
-                      base-buffer-name
-                    (let ((suffix "")
-                          (id 1)
-                          (name base-buffer-name))
-                      (while (get-buffer name)
-                        (setq id (+ 1 id))
-                        (setq suffix (concat "<" (number-to-string id) ">"))
-                        (setq name (concat base-buffer-name suffix)))
-                      name))))
-    ;; always prompt if the var is set, even if we're sure we want to reuse
-    (if scripty/confirm-buffer-name (read-string "buffer name: " candidate) candidate)))
+  (generate-new-buffer-name (concat "*scripty-" command "*") (buffer-name (current-buffer))))
 
 (defun scripty/run! (command args buffer-name)
   (async-shell-command (concat scripty/executable " " command " " args) buffer-name))

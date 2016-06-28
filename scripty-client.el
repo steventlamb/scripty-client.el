@@ -1,4 +1,4 @@
-;;; scripty-client.el --- Run scripty from emacs
+;;; kj-client.el --- Run kj from emacs
 
 (require 'dash)
 (require 's)
@@ -7,70 +7,70 @@
 ;;; PUBLIC VARS ;;;
 ;;;;;;;;;;;;;;;;;;;
 
-(defvar scripty/executable "scripty"
-  "The executable used to run scripty.
+(defvar kj/executable "kj"
+  "The executable used to run kj.
 
-You can customize this var if you don't have`scripty`
+You can customize this var if you don't have `kj`
 available on your path")
 
-(defcustom scripty/confirm-buffer-name nil
+(defcustom kj/confirm-buffer-name nil
   "Prompt the user to edit buffer names when set to `t`")
 
 ;;;;;;;;;;;;;;;;;;;;
 ;;; INTERNAL API ;;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(defvar scripty/last-script "" "do not hand-edit")
-(put 'scripty/last-script 'risky-local-variable t)
+(defvar kj/last-script "" "do not hand-edit")
+(put 'kj/last-script 'risky-local-variable t)
 
-(defvar scripty/last-args nil "do not hand-edit")
-(put 'scripty/last-args 'risky-local-variable t)
+(defvar kj/last-args nil "do not hand-edit")
+(put 'kj/last-args 'risky-local-variable t)
 
-(defun scripty/get-choices! ()
+(defun kj/get-choices! ()
   (interactive)
-  (let* ((list-command (concat scripty/executable " -l"))
+  (let* ((list-command (concat kj/executable " -l"))
          (cmd-results (shell-command-to-string list-command))
          (lines (if (equal "" cmd-results) '() (s-split "\n" cmd-results))))
     (-map 's-trim lines)))
 
-(defun scripty/prompt-for-command! ()
-  (let ((choices (scripty/get-choices!)))
+(defun kj/prompt-for-command! ()
+  (let ((choices (kj/get-choices!)))
     (unless (null choices)
-      (if (-contains? choices scripty/last-script)
-          (setq choices (-uniq (cons scripty/last-script choices))))
+      (if (-contains? choices kj/last-script)
+          (setq choices (-uniq (cons kj/last-script choices))))
       (let ((completion
              (ido-completing-read
               (concat "command: ") choices nil t)))
         completion))))
 
-(defun scripty/get-buffer-name! (command)
-  (generate-new-buffer-name (concat "*scripty-" command "*") (buffer-name (current-buffer))))
+(defun kj/get-buffer-name! (command)
+  (generate-new-buffer-name (concat "*kj-" command "*") (buffer-name (current-buffer))))
 
-(defun scripty/run! (command args buffer-name)
-  (async-shell-command (concat scripty/executable " " command " " args) buffer-name))
+(defun kj/run! (command args buffer-name)
+  (async-shell-command (concat kj/executable " " command " " args) buffer-name))
 
 ;;;;;;;;;;;;;;;;;;
 ;;; PUBLIC API ;;;
 ;;;;;;;;;;;;;;;;;;
 
-(defun scripty/rerun ()
+(defun kj/rerun ()
   (interactive)
-  (let ((c scripty/last-script))
-    (scripty/run! c (lax-plist-get scripty/last-args c) (scripty/get-buffer-name! c))))
+  (let ((c kj/last-script))
+    (kj/run! c (lax-plist-get kj/last-args c) (kj/get-buffer-name! c))))
 
-(defun scripty ()
+(defun kj ()
   ;; populate command
   (interactive)
 
-  (let ((command (scripty/prompt-for-command!)))
+  (let ((command (kj/prompt-for-command!)))
 
     ;; process command, prompt for arg, execute, save last values
     (if (null command)
-        (message "No scripty dir found")
-      (let ((args (read-string "args: " (lax-plist-get scripty/last-args command)))
-            (buffer-name (scripty/get-buffer-name! command)))
-        (setq scripty/last-script command)
-        (setq scripty/last-args (lax-plist-put scripty/last-args command args))
-        (scripty/run! command args buffer-name)))))
+        (message "No kj dir found")
+      (let ((args (read-string "args: " (lax-plist-get kj/last-args command)))
+            (buffer-name (kj/get-buffer-name! command)))
+        (setq kj/last-script command)
+        (setq kj/last-args (lax-plist-put kj/last-args command args))
+        (kj/run! command args buffer-name)))))
 
-(provide 'scripty-client)
+(provide 'kj-client)

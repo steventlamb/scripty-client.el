@@ -1,2 +1,2 @@
-# scripty-client.el
-Run scripty from emacs
+# kj-client.el
+Run kj from emacs

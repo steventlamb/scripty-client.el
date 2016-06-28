@@ -1,8 +1,8 @@
 (source gnu)
 (source melpa)
 
-(package "scripty-client" "0.1.0" "Run scripty from emacs")
-(files "README.md" "scripty-client.el")
+(package "kj-client" "0.1.1" "Run kj from emacs")
+(files "README.md" "kj-client.el")
 
 (depends-on "dash")
 (depends-on "s")

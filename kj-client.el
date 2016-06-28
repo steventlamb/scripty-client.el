@@ -31,7 +31,7 @@ available on your path")
   (let* ((list-command (concat kj/executable " -l"))
          (cmd-results (shell-command-to-string list-command))
          (lines (if (equal "" cmd-results) '() (s-split "\n" cmd-results))))
-    (-map 's-trim lines)))
+    (--filter (not (equal it "")) (-map 's-trim lines))))
 
 (defun kj/prompt-for-command! ()
   (let ((choices (kj/get-choices!)))
